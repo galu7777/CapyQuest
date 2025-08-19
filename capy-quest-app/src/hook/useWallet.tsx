@@ -191,6 +191,41 @@ export function useWallet() {
     [ready, authenticated, user, loadWallet, switchToAvalancheFuji]
   );
 
+  // Funcion para agregar token a MetaMask
+  const addTokenToMetaMask = useCallback(async () => {
+    if (!window.ethereum) {
+      alert("❌ MetaMask no está instalado");
+      return false;
+    }
+
+    try {
+      const wasAdded = await window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: contractAddress, // Tu dirección del contrato
+            symbol: 'CYC',
+            decimals: 18,
+            image: process.env.NEXT_PUBLIC_IPFS!, // Tu imagen
+          },
+        },
+      });
+
+      if (wasAdded) {
+        alert("✅ CapyCoin agregado a MetaMask con imagen!");
+        return true;
+      } else {
+        alert("❌ Usuario canceló la operación");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error agregando token:", error);
+      alert("❌ Error agregando token a MetaMask");
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     if (ready && authenticated && user?.wallet?.address) {
       loadWallet();
@@ -203,6 +238,7 @@ export function useWallet() {
     buyCapyCoins, 
     reload: loadWallet,
     isConnected: authenticated && !!user?.wallet?.address,
-    switchToAvalancheFuji
+    switchToAvalancheFuji,
+    addTokenToMetaMask
   };
 }
