@@ -1,0 +1,66 @@
+node_modules
+.env
+
+# Hardhat files
+/cache
+/artifacts
+
+# TypeChain files
+/typechain
+/typechain-types
+
+# solidity-coverage files
+/coverage
+/coverage.json
+
+# Hardhat Ignition default folder for deployments against a local node
+ignition/deployments/chain-31337
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Next.js build output
+# dependencies
+/capy-quest-app/node_modules
+/capy-quest-app/.pnp
+/capy-quest-app/.pnp.*
+/capy-quest-app/.yarn/*
+/capy-quest-app/!.yarn/patches
+/capy-quest-app/!.yarn/plugins
+/capy-quest-app/!.yarn/releases
+/capy-quest-app/!.yarn/versions
+
+# testing
+/capy-quest-app/coverage
+
+# next.js
+/capy-quest-app/.next/
+/capy-quest-app/out/
+
+# production
+/capy-quest-app/build
+
+# misc
+/capy-quest-app/.DS_Store
+/capy-quest-app/*.pem
+
+# debug
+/capy-quest-app/npm-debug.log*
+/capy-quest-app/yarn-debug.log*
+/capy-quest-app/yarn-error.log*
+/capy-quest-app/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+/capy-quest-app/.env*
+/capy-quest-app/package-lock.json
+
+# vercel
+/capy-quest-app/.vercel
+
+# typescript
+/capy-quest-app/*.tsbuildinfo
+/capy-quest-app/next-env.d.ts
+
+# Express API
+/api/node_modules
+/api/.env
+/api/package-lock.json
