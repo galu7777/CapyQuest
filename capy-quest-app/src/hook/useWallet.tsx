@@ -213,7 +213,7 @@ export function useWallet() {
       });
 
       if (wasAdded) {
-        alert("✅ CapyCoin agregado a MetaMask con imagen!");
+        alert("✅ CapyCoin agregado a MetaMask!");
         return true;
       } else {
         alert("❌ Usuario canceló la operación");
