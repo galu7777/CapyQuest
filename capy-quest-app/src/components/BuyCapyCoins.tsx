@@ -8,7 +8,7 @@ import Image from "next/image";
 import capyquest from "@/assets/capy.png";
 
 export default function BuyCapyCoins() {
-  const { wallet, loading, buyCapyCoins, reload, isConnected, switchToAvalancheFuji } = useWallet();
+  const { wallet, loading, buyCapyCoins, reload, isConnected, switchToAvalancheFuji, addTokenToMetaMask } = useWallet();
   const { ready, authenticated, login, logout, user } = usePrivy();
   const router = useRouter();
   
@@ -180,6 +180,12 @@ export default function BuyCapyCoins() {
                 className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 hover:from-orange-500 hover:to-orange-400 shadow-md hover:shadow-lg px-4 py-3 text-sm flex items-center justify-center"
               >
                 💰 Retirar AVAX
+              </button>
+              <button
+                onClick={addTokenToMetaMask}
+                className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 hover:from-orange-500 hover:to-orange-400 shadow-md hover:shadow-lg px-4 py-3 text-sm flex items-center justify-center"
+              >
+                🦊 Agregar Token a MetaMask o Wallet
               </button>
               <button
                 onClick={logout}
