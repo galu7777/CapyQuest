@@ -1,86 +1,67 @@
-# Sample Hardhat Project
+<p align="left">
+  <img height="200" src="./capy-quest-app/src/assets/capyquest.png" alt="Polaris Logo"/>
+</p>
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+CapyQuest es un ecosistema Web3 que combina **gamificación, coleccionables digitales y geolocalización**.  
+El proyecto está desarrollado con **Solidity** para los contratos inteligentes y **Next.js** en el frontend.  
 
-Try running some of the following tasks:
+👉 Visita nuestra web: [capyquest](https://capyquest.com)
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.js
-```
-### Comands
-```compile
-  npx hardhat compile
-``` 
+---
 
-```deploy
-  npx hardhat ignition deploy  ./ignition/modules/Lock.js
-``` 
+## 🚀 Descripción
 
-```deploy reset
-  npx hardhat ignition deploy  ./ignition/modules/Lock.js --reset
-``` 
+CapyQuest permite a los usuarios:
 
-``` node
-  npx hardhat node
-``` 
+- Comprar y utilizar **CapyCoins (ERC-20)** como moneda principal del ecosistema.  
+- Interactuar con NFTs coleccionables y funcionalidades de geolocalización.  
+- Acceder a un futuro **marketplace** para intercambiar ítems digitales.  
+- Disfrutar experiencias con **AR (Realidad Aumentada)** en el mundo real.  
 
-```console
-  npx hardhat console
-```
+Este proyecto busca crear un **puente entre lo digital y lo físico**, utilizando tecnología blockchain para garantizar seguridad, transparencia y propiedad digital.
 
+---
 
-## PASO A PASO - Ejecutar en Hardhat Console (npx hardhat console --network localhost)
+## 📅 Roadmap Inicial
 
-### PASO 1: Conectar al contrato desplegado
-const contractAddress = "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9";
-const CapyCoin = await ethers.getContractFactory("CapyCoin");
-const capycoin = CapyCoin.attach(contractAddress);
+### Semana 1
+- ✅ Implementación del token **CapyCoin (ERC-20)**.  
+- ✅ Creación del repositorio y documentación (roadmap incluido).  
+- ✅ Habilitar la funcionalidad de compra de CapyCoins.  
 
-### PASO 2: Obtener las cuentas de Hardhat
-const [deployer, account1, account2, account3] = await ethers.getSigners();
+### Semana 2
+- 🔜 Implementación del **Marketplace** de NFTs.  
+- 🔜 Funciones de **geolocalización** en el mapa.  
+- 🔜 Integración con **Realidad Aumentada (AR)** para coleccionables.  
 
-### PASO 3: Ver información básica del contrato
-await capycoin.name();
-await capycoin.symbol();
-await capycoin.tokenPrice();
+---
 
-### PASO 4: Ver balance inicial del deployer (quien recibió 100M tokens)
-ethers.formatEther(await capycoin.balanceOf(deployer.address));
+## 🛠️ Stack Tecnológico
 
-### PASO 5: Comprar tokens con account1 - Enviar 1.5 ETH
-const ethAmount1 = ethers.parseEther("1.5");
-await capycoin.getTokensForEth(ethAmount1); // Ver cuántos tokens recibirás
+- **Blockchain / Smart Contracts** → [Solidity](https://soliditylang.org/)  
+- **Framework Web** → [Next.js](https://nextjs.org/)  
+- **Frontend** → React + TailwindCSS  
+- **Infraestructura** → Ethereum / Compatible con EVM  
 
-### PASO 6: Ejecutar la compra con account1
-const tx1 = await capycoin.connect(account1).buyCapyCoin({ value: ethAmount1 });
-await tx1.wait();
-### PASO 7: Verificar balance de account1 después de comprar
-ethers.formatEther(await capycoin.balanceOf(account1.address));
+---
 
-### PASO 8: Comprar tokens con account2 - Enviar 0.5 ETH
-const ethAmount2 = ethers.parseEther("0.5");
-const tx2 = await capycoin.connect(account2).buyCapyCoin({ value: ethAmount2 });
-await tx2.wait();
+## 🌎 Misión
 
-### PASO 9: Ver balance de account2
-ethers.formatEther(await capycoin.balanceOf(account2.address));
+Construir una plataforma divertida y segura donde los jugadores puedan:  
+- Coleccionar, explorar y comerciar ítems digitales.  
+- Incentivar la interacción con el mundo real a través de blockchain y AR.  
+- Usar **CapyCoins** como la moneda central de todo el ecosistema.  
 
-### PASO 10: Ver ETH acumulado en el contrato
-ethers.formatEther(await ethers.provider.getBalance(contractAddress));
+---
 
-### PASO 11: Ver supply total y restante
-ethers.formatEther(await capycoin.totalSupply());
-ethers.formatEther(await capycoin.remainingSupply());
+## 📩 Contribuciones
 
-### PASO 12: (Opcional) Owner retira fondos
-const withdrawTx = await capycoin.connect(deployer).withdrawFunds();
-await withdrawTx.wait();
+¡Las contribuciones son bienvenidas!  
+Si quieres participar, revisa el roadmap, abre un issue o envía un PR.  
 
-### PASO 13: Verificar que el ETH fue retirado
-ethers.formatEther(await ethers.provider.getBalance(contractAddress));
+---
 
-100,000,000.000000000000002
+## 📜 Licencia
+
+Este proyecto está bajo la licencia **MIT**.  
+Consulta el archivo [LICENSE](./LICENSE) para más detalles.  
