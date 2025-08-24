@@ -1063,7 +1063,12 @@ export const publicClient = createPublicClient({
   transport: http(process.env.NEXT_PUBLIC_RPC_URL!),
 });
 
-export const getWalletClient = (wallet: any) => {
+// Tipo para el wallet
+interface WalletProvider {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+}
+
+export const getWalletClient = (wallet: WalletProvider) => {
   return createWalletClient({
     chain: avalancheFuji,
     transport: custom(wallet)

@@ -8,7 +8,7 @@ import Image from "next/image";
 import capyquest from "@/assets/capy.png";
 
 export default function BuyCapyCoins() {
-  const { wallet, loading, buyCapyCoins, reload, isConnected, switchToAvalancheFuji, addTokenToMetaMask } = useWallet();
+  const { wallet, loading, buyCapyCoins, reload, switchToAvalancheFuji, addTokenToMetaMask } = useWallet();
   const { ready, authenticated, login, logout, user } = usePrivy();
   const router = useRouter();
   
@@ -159,12 +159,14 @@ export default function BuyCapyCoins() {
             {/* Botones de acción */}
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
+                key="switch-network"
                 onClick={switchToAvalancheFuji}
                 className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 hover:from-orange-500 hover:to-orange-400 shadow-md hover:shadow-lg px-4 py-3 text-sm"
               >
                 🔗 Avalanche Fuji
               </button>
               <button
+                key="reload-wallet"
                 onClick={reload}
                 disabled={loading}
                 className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-amber-500 to-amber-400 text-white hover:from-amber-600 hover:to-amber-500 shadow-md hover:shadow-lg px-4 py-3 text-sm disabled:opacity-50"
@@ -174,22 +176,27 @@ export default function BuyCapyCoins() {
             </div>
 
             {/* Botones administrativos */}
-            <div className="grid grid-cols-2 gap-3 border-t border-amber-200 pt-6">
+            <div className="space-y-3 border-t border-amber-200 pt-6">
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  key="withdraw"
+                  onClick={goToWithdraw}
+                  className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 hover:from-orange-500 hover:to-orange-400 shadow-md hover:shadow-lg px-4 py-3 text-sm flex items-center justify-center"
+                >
+                  💰 Retirar AVAX
+                </button>
+                <button
+                  key="add-token"
+                  onClick={addTokenToMetaMask}
+                  className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 hover:from-orange-500 hover:to-orange-400 shadow-md hover:shadow-lg px-4 py-3 text-sm flex items-center justify-center"
+                >
+                  🦊 Agregar Token
+                </button>
+              </div>
               <button
-                onClick={goToWithdraw}
-                className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 hover:from-orange-500 hover:to-orange-400 shadow-md hover:shadow-lg px-4 py-3 text-sm flex items-center justify-center"
-              >
-                💰 Retirar AVAX
-              </button>
-              <button
-                onClick={addTokenToMetaMask}
-                className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 hover:from-orange-500 hover:to-orange-400 shadow-md hover:shadow-lg px-4 py-3 text-sm flex items-center justify-center"
-              >
-                🦊 Agregar Token a MetaMask o Wallet
-              </button>
-              <button
+                key="logout"
                 onClick={logout}
-                className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-red-500 to-red-400 text-white hover:from-red-600 hover:to-red-500 shadow-md hover:shadow-lg px-4 py-3 text-sm"
+                className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-red-500 to-red-400 text-white hover:from-red-600 hover:to-red-500 shadow-md hover:shadow-lg px-4 py-3 text-sm w-full"
               >
                 🚪 Desconectar
               </button>

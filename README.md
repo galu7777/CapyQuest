@@ -1,11 +1,11 @@
 <p align="left">
-  <img height="400" src="./capy-quest-app/src/assets/capyquest.png" alt="Polaris Logo"/>
+  <img height="400" src="./capy-quest-app/src/assets/capyquest.png" alt="CapyQuest Logo"/>
 </p>
 
 CapyQuest is a Web3 project built with **Solidity** for smart contracts and **Next.js** for the frontend.  
 Our mission is to create a fun and interactive ecosystem around **CapyCoin**, combining blockchain, geospatial features, and future AR integrations.  
 
-🌍 Website: [capyquest.com](https://capyquest.com)
+🌍 Website: [CapyQuest](https://capyquest.com)
 
 ---
 
@@ -40,7 +40,7 @@ Our mission is to create a fun and interactive ecosystem around **CapyCoin**, co
 ## 📂 Tech Stack
 - **Smart Contracts**: Solidity  
 - **Frontend**: Next.js  
-- **Blockchain**: Ethereum-compatible  
+- **Blockchain**: Avalanche-AVAX  
 
 ---
 
@@ -51,4 +51,4 @@ Check out our roadmap and repo to get started.
 ---
 
 ## 📧 Contact
-Visit us at [capyquest.com](https://capyquest.com)  
+Visit us at [CapyQuest](https://capyquest.com)  

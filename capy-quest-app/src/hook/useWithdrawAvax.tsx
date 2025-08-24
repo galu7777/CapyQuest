@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useWallet } from "@/hook/useWallet";
 import { usePrivy } from "@privy-io/react-auth";
 import { ethers } from "ethers";
@@ -6,7 +6,7 @@ import { CapyCoinAbi, contractAddress } from "@/utils/contract";
 
 export function useWithdrawAvax() {
   const { wallet, isConnected } = useWallet();
-  const { user, authenticated } = usePrivy();
+  const { authenticated } = usePrivy();
   const [contractBalance, setContractBalance] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
@@ -20,7 +20,7 @@ export function useWithdrawAvax() {
   };
 
   // Verificar si el usuario es el owner del contrato
-  const checkIsOwner = async () => {
+  const checkIsOwner = useCallback(async () => {
     if (!isConnected || !wallet.address) {
       setIsOwner(false);
       return;
@@ -36,10 +36,10 @@ export function useWithdrawAvax() {
       console.error("Error checking owner:", error);
       setIsOwner(false);
     }
-  };
+  }, [isConnected, wallet.address]);
 
   // Obtener el balance del contrato
-  const getContractBalance = async () => {
+  const getContractBalance = useCallback(async () => {
     setLoading(true);
     try {
       const provider = getProvider();
@@ -52,7 +52,7 @@ export function useWithdrawAvax() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Retirar todos los fondos
   const withdrawAllFunds = async () => {
@@ -75,11 +75,12 @@ export function useWithdrawAvax() {
         success: true, 
         txHash: receipt.hash 
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error withdrawing all funds:", error);
+      const errorMessage = error instanceof Error ? error.message : "Transaction failed";
       return { 
         success: false, 
-        error: error.message || "Transaction failed" 
+        error: errorMessage 
       };
     }
   };
@@ -108,11 +109,12 @@ export function useWithdrawAvax() {
         success: true, 
         txHash: receipt.hash 
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error withdrawing specific amount:", error);
+      const errorMessage = error instanceof Error ? error.message : "Transaction failed";
       return { 
         success: false, 
-        error: error.message || "Transaction failed" 
+        error: errorMessage 
       };
     }
   };
@@ -123,7 +125,7 @@ export function useWithdrawAvax() {
       checkIsOwner();
       getContractBalance();
     }
-  }, [authenticated, isConnected, wallet.address]);
+  }, [authenticated, isConnected, wallet.address, checkIsOwner, getContractBalance]);
 
   return {
     contractBalance,
