@@ -5,7 +5,7 @@
 CapyQuest is a Web3 project built with **Solidity** for smart contracts and **Next.js** for the frontend.  
 Our mission is to create a fun and interactive ecosystem around **CapyCoin**, combining blockchain, geospatial features, and future AR integrations.  
 
-🌍 Website: [CapyQuest](https://capyquest.com)
+🌍 Website: [CapyQuest](https://capy-quest.vercel.app/)
 
 ---
 
@@ -51,4 +51,4 @@ Check out our roadmap and repo to get started.
 ---
 
 ## 📧 Contact
-Visit us at [CapyQuest](https://capyquest.com)  
+Visit us at [CapyQuest](https://capy-quest.vercel.app/)  
