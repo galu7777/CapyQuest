@@ -1,4 +1,4 @@
-import NFTPage from "@/components/NFTPage";
+import NFTPage from "@/pages/NFTPage";
 
 export default function WithdrawPage() {
   return (
