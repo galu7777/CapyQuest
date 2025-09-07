@@ -2,11 +2,22 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { MapPin, Navigation, Save, Trash2, Play, Square, 
-  Loader, AlertCircle, Trophy, Zap, Target, Users, Map as MapIcon, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
+  Loader, AlertCircle, Trophy, Zap, Target, Users, Map as MapIcon, Plus, X, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'
 import Map, { Marker, Popup, Source, Layer } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useNFTDistributed } from '@/hook/useNFTDistributed'
-import Capy from "@/assets/capy.png"
+import Image from 'next/image'
+import Capy from "@/assets/capy-white.png"
+
+// Importar las descripciones de NFTs
+import { descNFTs } from '@/constant/descNFTs'
+
+// Importar imágenes específicas para cada tipo de NFT
+import BabyCapyImage from "@/assets/NFTs/BabyCapy.png"
+import ExploreCapyImage from "@/assets/NFTs/ExploreCapy.png"
+import WiseCapyImage from "@/assets/NFTs/WiseCapy.png"
+import LegendaryCapyImage from "@/assets/NFTs/LegendaryCapy.png"
+import GoldenCapyImage from "@/assets/NFTs/GoldenCapy.png"
 
 interface Coordinates {
   lng: number
@@ -23,6 +34,24 @@ interface PolygonData {
 // Configuración de Mapbox
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'your_mapbox_token_here'
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/streets-v11'
+
+// Mapeo de rarezas a imágenes (solo para vista de detalle)
+const rarityImages = {
+  0: BabyCapyImage,
+  1: ExploreCapyImage,
+  2: WiseCapyImage,
+  3: LegendaryCapyImage,
+  4: GoldenCapyImage
+}
+
+// Mapeo de rarezas a nombres
+const rarityNames = {
+  0: "Capy Bebe",
+  1: "Capy Explorador", 
+  2: "Capy Sabio",
+  3: "Capy Legendario",
+  4: "Capy Dorado"
+}
 
 export default function TreasureZoneImproved() {
   // Estados principales
@@ -53,6 +82,7 @@ export default function TreasureZoneImproved() {
   const [showDistributionMenu, setShowDistributionMenu] = useState(false)
   const [selectedNFT, setSelectedNFT] = useState<any>(null)
   const [showLocationStatus, setShowLocationStatus] = useState(true)
+  const [showNFTDetail, setShowNFTDetail] = useState(false)
   
   const mapRef = useRef<any>(null)
   const watchIdRef = useRef<number | null>(null)
@@ -245,9 +275,44 @@ export default function TreasureZoneImproved() {
     const result = await claimNFT(nft.tokenId, nft.location)
     if (result.success) {
       alert('NFT reclamado exitosamente!')
+      setShowNFTDetail(false)
     } else {
       alert(`Error al reclamar el NFT: ${result.error}`)
     }
+  }
+
+  // Verificar proximidad al hacer clic en un NFT
+  const handleNFTMarkerClick = async (nft: any) => {
+    if (!userLocation) {
+      alert('Necesitas activar tu ubicación para interactuar con NFTs')
+      return
+    }
+
+    const [lat, lng] = nft.location.split(',').map(parseFloat)
+    const nftLocation = { lat, lng }
+    const distance = calculateDistance(userLocation, nftLocation)
+    
+    if (distance <= 10) {
+      setSelectedNFT(nft)
+      setShowNFTDetail(true)
+    } else {
+      alert(`Estás a ${distance.toFixed(2)} metros del NFT. Debes estar dentro de 10 metros para interactuar con él.`)
+    }
+  }
+
+  // Obtener imagen según la rareza del NFT (solo para vista de detalle)
+  const getNFTImage = (rarity: number) => {
+    return rarityImages[rarity as keyof typeof rarityImages] || Capy
+  }
+
+  // Obtener nombre según la rareza del NFT
+  const getNFTName = (rarity: number) => {
+    return rarityNames[rarity as keyof typeof rarityNames] || "Capy"
+  }
+
+  // Obtener descripción según la rareza del NFT
+  const getNFTDescription = (rarity: number) => {
+    return descNFTs[rarity]?.description || "Este es un NFT especial de Capy. Coleccíonalo y forma parte de la comunidad de cazadores de tesoros."
   }
 
   // Generar GeoJSON para el polígono actual
@@ -277,6 +342,67 @@ export default function TreasureZoneImproved() {
         id: polygon.id
       }
     }))
+  }
+
+  // Vista de detalle del NFT
+  if (showNFTDetail && selectedNFT) {
+    const nftImage = getNFTImage(selectedNFT.rarity)
+    const nftName = getNFTName(selectedNFT.rarity)
+    const nftDescription = getNFTDescription(selectedNFT.rarity)
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-4">
+        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-4 flex items-center justify-between">
+            <button 
+              onClick={() => setShowNFTDetail(false)}
+              className="text-white p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-xl font-bold text-white">Detalle del NFT</h1>
+            <div className="w-9"></div> {/* Spacer para centrar el título */}
+          </div>
+          
+          {/* NFT Content */}
+          <div className="p-6">
+            <div className="w-32 h-32 mx-auto rounded-full border-4 border-yellow-400 shadow-lg overflow-hidden mb-6">
+              <Image 
+                src={nftImage} 
+                alt={nftName}
+                width={128}
+                height={128}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-amber-800 mb-2">{nftName}</h2>
+              <p className="text-amber-600">Token ID: #{selectedNFT.tokenId.toString()}</p>
+              <p className="text-amber-500 text-sm mt-1">
+                Rareza: {selectedNFT.rarityName}
+              </p>
+            </div>
+            
+            <div className="bg-amber-50 rounded-xl p-4 mb-6">
+              <h3 className="font-semibold text-amber-800 mb-2">Descripción</h3>
+              <p className="text-amber-700 text-sm">
+                {nftDescription}
+              </p>
+            </div>
+            
+            <button
+              onClick={() => handleClaimNFT(selectedNFT)}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:from-green-600 hover:to-green-700 transition-all"
+            >
+              <Zap className="w-5 h-5" />
+              Reclamar NFT
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -386,18 +512,27 @@ export default function TreasureZoneImproved() {
           {/* Distributed NFTs - Solo visible en pestaña En Mapa */}
           {activeTab === 'active' && nftState.distributedNFTs.map((nft) => {
             const [lat, lng] = nft.location.split(',').map(parseFloat)
+            
             return (
               <Marker
                 key={nft.tokenId.toString()}
                 longitude={lng}
                 latitude={lat}
-                anchor="bottom"
+                anchor="center"
                 onClick={(e) => {
                   e.originalEvent.stopPropagation()
-                  setSelectedNFT(nft)
+                  handleNFTMarkerClick(nft)
                 }}
               >
-                <div className="w-6 h-6 bg-yellow-500 border-2 border-white rounded-full shadow-lg cursor-pointer animate-pulse"></div>
+                <div className="w-10 h-10 rounded-full border-2 border-yellow-400 overflow-hidden shadow-lg">
+                  <Image 
+                    src={Capy}
+                    alt="NFT" 
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </Marker>
             )
           })}
@@ -411,29 +546,6 @@ export default function TreasureZoneImproved() {
             >
               <div className="w-8 h-8 bg-red-500 border-4 border-white rounded-full shadow-lg animate-bounce"></div>
             </Marker>
-          )}
-          
-          {/* Popup for selected NFT - Solo visible en pestaña En Mapa */}
-          {activeTab === 'active' && selectedNFT && (
-            <Popup
-              longitude={parseFloat(selectedNFT.location.split(',')[1])}
-              latitude={parseFloat(selectedNFT.location.split(',')[0])}
-              anchor="top"
-              onClose={() => setSelectedNFT(null)}
-              className="rounded-lg"
-            >
-              <div className="p-2">
-                <p className="font-semibold">{selectedNFT.rarityName}</p>
-                <p className="text-sm">Token ID: #{selectedNFT.tokenId.toString()}</p>
-                <button
-                  onClick={() => handleClaimNFT(selectedNFT)}
-                  className="mt-2 bg-green-500 text-white px-3 py-1 rounded-lg text-xs flex items-center gap-1 hover:bg-green-600 w-full justify-center"
-                >
-                  <Zap className="w-3 h-3" />
-                  Reclamar NFT
-                </button>
-              </div>
-            </Popup>
           )}
         </Map>
         
@@ -521,38 +633,54 @@ export default function TreasureZoneImproved() {
                     <p className="p-3 text-amber-600 text-xs">No tienes NFTs disponibles para distribuir</p>
                   ) : (
                     <div className="space-y-1 p-2">
-                      {nftState.userNFTs.filter(nft => !nft.isActiveOnMap).map(nft => (
-                        <div
-                          key={nft.tokenId.toString()}
-                          onClick={() => {
-                            const tokenId = nft.tokenId
-                            setSelectedNFTs(prev => 
-                              prev.includes(tokenId) 
-                                ? prev.filter(id => id !== tokenId)
-                                : [...prev, tokenId]
-                            )
-                          }}
-                          className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all ${
-                            selectedNFTs.includes(nft.tokenId)
-                              ? 'bg-yellow-100 border border-yellow-300'
-                              : 'bg-amber-50 hover:bg-yellow-50'
-                          }`}
-                        >
-                          <div>
-                            <p className="font-medium text-amber-800 text-xs">{nft.rarityName}</p>
-                            <p className="text-amber-600 text-xs">#{nft.tokenId.toString()}</p>
+                      {nftState.userNFTs.filter(nft => !nft.isActiveOnMap).map(nft => {
+                        const nftImage = getNFTImage(nft.rarity)
+                        const nftName = getNFTName(nft.rarity)
+                        
+                        return (
+                          <div
+                            key={nft.tokenId.toString()}
+                            onClick={() => {
+                              const tokenId = nft.tokenId
+                              setSelectedNFTs(prev => 
+                                prev.includes(tokenId) 
+                                  ? prev.filter(id => id !== tokenId)
+                                  : [...prev, tokenId]
+                              )
+                            }}
+                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all ${
+                              selectedNFTs.includes(nft.tokenId)
+                                ? 'bg-yellow-100 border border-yellow-300'
+                                : 'bg-amber-50 hover:bg-yellow-50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full border-2 border-yellow-400 overflow-hidden">
+                                <Image 
+                                  src={nftImage} 
+                                  alt={nftName}
+                                  width={32}
+                                  height={32}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div>
+                                <p className="font-medium text-amber-800 text-xs">{nftName}</p>
+                                <p className="text-amber-600 text-xs">#{nft.tokenId.toString()}</p>
+                              </div>
+                            </div>
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                              selectedNFTs.includes(nft.tokenId)
+                                ? 'border-yellow-500 bg-yellow-500'
+                                : 'border-amber-300'
+                            }`}>
+                              {selectedNFTs.includes(nft.tokenId) && (
+                                <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                              )}
+                            </div>
                           </div>
-                          <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                            selectedNFTs.includes(nft.tokenId)
-                              ? 'border-yellow-500 bg-yellow-500'
-                              : 'border-amber-300'
-                          }`}>
-                            {selectedNFTs.includes(nft.tokenId) && (
-                              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   )}
                   
@@ -701,21 +829,36 @@ export default function TreasureZoneImproved() {
                 <p className="p-3 text-amber-600 text-xs">No hay NFTs distribuidos en el mapa</p>
               ) : (
                 <div className="overflow-y-auto max-h-60">
-                  {nftState.distributedNFTs.map(nft => (
-                    <div key={nft.tokenId.toString()} className="flex items-center justify-between p-2 border-b">
-                      <div>
-                        <p className="font-medium text-amber-800 text-xs">{nft.rarityName}</p>
-                        <p className="text-amber-600 text-xs">#{nft.tokenId.toString()}</p>
+                  {nftState.distributedNFTs.map(nft => {
+                    const nftName = getNFTName(nft.rarity)
+                    
+                    return (
+                      <div key={nft.tokenId.toString()} className="flex items-center justify-between p-2 border-b">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full border-2 border-yellow-400 overflow-hidden">
+                            <Image 
+                              src={Capy}
+                              alt={nftName}
+                              width={32}
+                              height={32}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <p className="font-medium text-amber-800 text-xs">Capybara NFT</p>
+                            {/* <p className="text-amber-600 text-xs"># ???</p> */}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleNFTMarkerClick(nft)}
+                          className="bg-blue-500 text-white px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-blue-600"
+                        >
+                          <MapPin className="w-3 h-3" />
+                          Ver
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleClaimNFT(nft)}
-                        className="bg-green-500 text-white px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-green-600"
-                      >
-                        <Zap className="w-3 h-3" />
-                        Reclamar
-                      </button>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
