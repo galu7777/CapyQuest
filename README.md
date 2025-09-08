@@ -21,7 +21,7 @@ Nuestra misión es crear un ecosistema divertido e interactivo alrededor de **Ca
 
 ---
 
-## 🚀 Funcionalidades Actuales
+## 🚀 Funcionalidades Actuales (Stage 1)
 - Smart contracts escritos en **Solidity** para CapyCoin (ERC-20) y CapyNFT (ERC-721).  
 - Frontend funcional en **Next.js**.  
 - Comprar CapyCoins y mintear NFTs.  
@@ -32,8 +32,12 @@ Nuestra misión es crear un ecosistema divertido e interactivo alrededor de **Ca
 - Contratos desplegados en la **testnet Fuji** de Avalanche.  
 
 ---
-## 🛠 Próximas Funciones (Stage 3)
-- **Integración AR**: experiencia inmersiva para encontrar y reclamar NFTs.
+
+## 🛠 Próximas Funciones (Stage 2)
+- **Marketplace completo**: compra, venta e intercambio de NFTs usando CapyCoin.  
+- **Integración AR**: experiencia inmersiva para encontrar y reclamar NFTs.  
+- **Geospatial avanzado**: exploración de NFTs con radio de reclamo definido (10m en staging, 150m en testing).  
+
 ---
 
 ## 🎯 Resumen del Modelo Económico
@@ -77,9 +81,11 @@ Nuestra misión es crear un ecosistema divertido e interactivo alrededor de **Ca
   - Comprar y mintear NFTs.  
   - Publicar repositorio y roadmap.  
 
-- **Semana 2**:  
+- **Semana 2 y 3**:  
   - Marketplace y trading de NFTs.  
   - Geospatial features avanzadas.  
+
+- **Semana 4**:  
   - Integración AR.  
 
 ---
