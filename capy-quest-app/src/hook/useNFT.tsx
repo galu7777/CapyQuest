@@ -33,6 +33,14 @@ interface ExtendedListing extends Listing {
   rarityName: string;
 }
 
+// Nueva interfaz para información de burn
+interface BurnInfo {
+  nftValue: string;
+  feePercentage: number;
+  refundAmount: string;
+  feeAmount: string;
+}
+
 interface NFTState {
   userNFTs: UserNFT[];
   activeListings: ExtendedListing[];
@@ -183,6 +191,84 @@ export function useNFT() {
       }
     }
   }, [ready]);
+
+  // NUEVA: Obtener información de burn para un NFT
+  const getBurnInfo = useCallback(
+    async (tokenId: bigint): Promise<BurnInfo | null> => {
+      try {
+        const burnInfo = await publicClient.readContract({
+          address: nftContractAddress as `0x${string}`,
+          abi: CapyNFTAbi,
+          functionName: "getBurnInfo",
+          args: [tokenId],
+        }) as [bigint, bigint, bigint, bigint];
+
+        const [nftValue, feePercentage, refundAmount, feeAmount] = burnInfo;
+
+        return {
+          nftValue: formatUnits(nftValue, 18),
+          feePercentage: Number(feePercentage),
+          refundAmount: formatUnits(refundAmount, 18),
+          feeAmount: formatUnits(feeAmount, 18),
+        };
+      } catch (err) {
+        console.error("Error getting burn info:", err);
+        return null;
+      }
+    },
+    []
+  );
+
+  // NUEVA: Quemar NFT
+  const burnNFT = useCallback(
+    async (tokenId: bigint) => {
+      if (!ready || !authenticated || !user?.wallet?.address) {
+        return { success: false, error: "No wallet connected" };
+      }
+
+      try {
+        setLoading(true);
+
+        if (!window.ethereum) {
+          return { success: false, error: "MetaMask no está instalado" };
+        }
+
+        const account = user.wallet.address as `0x${string}`;
+        const walletClient = getWalletClient(window.ethereum);
+
+        const txHash = await walletClient.writeContract({
+          address: nftContractAddress as `0x${string}`,
+          abi: CapyNFTAbi,
+          functionName: "burnNFT",
+          args: [tokenId],
+          account,
+        });
+
+        await publicClient.waitForTransactionReceipt({ hash: txHash });
+        await loadUserNFTs();
+
+        return { success: true, txHash };
+      } catch (err: unknown) {
+        let errorMessage = "Error desconocido";
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        }
+        if (errorMessage.includes("Not the owner")) {
+          errorMessage = "No eres el propietario de este NFT";
+        } else if (errorMessage.includes("NFT is active on map")) {
+          errorMessage = "No puedes quemar un NFT activo en el mapa";
+        } else if (errorMessage.includes("Insufficient contract balance")) {
+          errorMessage = "El contrato no tiene suficientes CapyCoins";
+        } else if (errorMessage.includes("user rejected")) {
+          errorMessage = "Transacción cancelada por el usuario";
+        }
+        return { success: false, error: errorMessage };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [ready, authenticated, user, loadUserNFTs]
+  );
 
   // Aprobar CapyCoin para el contrato NFT
   const approveCapyCoin = useCallback(
@@ -460,6 +546,8 @@ export function useNFT() {
     approveCapyCoinForMarketplace,
     listNFTForSale,
     buyNFTFromMarketplace,
+    burnNFT, // NUEVA función
+    getBurnInfo, // NUEVA función
     reload: loadUserNFTs,
     reloadListings: loadActiveListings,
     isConnected: authenticated && !!user?.wallet?.address,

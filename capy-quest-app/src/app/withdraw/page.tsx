@@ -1,4 +1,4 @@
-import WithdrawAvax from "@/components/WithdrawAvax";
+import WithdrawAvax from "@/pages/WithdrawAvax";
 
 export default function WithdrawPage() {
   return (

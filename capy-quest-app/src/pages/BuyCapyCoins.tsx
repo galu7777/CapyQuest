@@ -6,7 +6,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import capyquest from "@/assets/CYC-r.png";
-import { Coins, Network, RefreshCw, Download, Plus, LogOut, Store, User, Wallet, Star } from "lucide-react";
+import { Coins, Network, RefreshCw, Download, Plus, LogOut, Store, User, Wallet, Star, Map } from "lucide-react";
 
 export default function BuyCapyCoins() {
   const { wallet, loading, buyCapyCoins, reload, switchToAvalancheFuji, addTokenToMetaMask } = useWallet();
@@ -219,6 +219,14 @@ export default function BuyCapyCoins() {
               >
                 <Store className="w-4 h-4 mr-2" />
                 Ir Marketplace
+              </button>
+              <button
+                key="treasure-zone"
+                onClick={() => router.push('/treasure-zone')}
+                className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-blue-500 to-blue-400 text-white hover:from-blue-600 hover:to-blue-500 shadow-md hover:shadow-lg px-4 py-3 text-sm w-full flex items-center justify-center"
+              >
+                <Map className="w-4 h-4 mr-2" />
+                Ir a Zona del Tesoro
               </button>
               <button
                 key="logout"
