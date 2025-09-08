@@ -257,7 +257,8 @@ export function useNFTDistributed() {
         address: nftContractAddress as `0x${string}`,
         abi: CapyNFTAbi,
         functionName: "claimNFT",
-        args: [tokenId, account, location],
+        // args: [tokenId, account, location],
+        args: [tokenId],
         account,
       });
 
