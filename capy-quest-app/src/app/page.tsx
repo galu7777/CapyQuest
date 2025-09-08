@@ -1,5 +1,5 @@
 // app/page.tsx (página principal)
-import BuyCapyCoins from "@/components/BuyCapyCoins";
+import BuyCapyCoins from "@/pages/BuyCapyCoins";
 
 export default function Home() {
   return (

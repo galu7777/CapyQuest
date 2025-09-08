@@ -17,12 +17,15 @@ import {
   AlertCircle,
   Wallet,
   Loader2,
-  X
+  X,
+  Flame,
+  Info,
+  AlertTriangle
 } from "lucide-react";
 
 export default function NFTPage() {
   const { nftState, loading, mintNFT, approveCapyCoin, approveCapyCoinForMarketplace, listNFTForSale, buyNFTFromMarketplace, 
-    reload, reloadListings, isConnected, Rarity, RarityNames, RarityPrices } = useNFT();
+    burnNFT, getBurnInfo, reload, reloadListings, isConnected, Rarity, RarityNames, RarityPrices } = useNFT();
   const { ready, authenticated, login } = usePrivy();
   
   const [activeTab, setActiveTab] = useState<'mint' | 'collection' | 'marketplace'>('mint');
@@ -31,8 +34,16 @@ export default function NFTPage() {
   const [minting, setMinting] = useState(false);
   const [buying, setBuying] = useState(false);
   const [listing, setListing] = useState(false);
+  const [burning, setBurning] = useState(false);
   const [listPrice, setListPrice] = useState("");
   const [selectedTokenId, setSelectedTokenId] = useState<bigint | null>(null);
+  const [burnTokenId, setBurnTokenId] = useState<bigint | null>(null);
+  const [burnInfo, setBurnInfo] = useState<{
+    nftValue: string;
+    feePercentage: number;
+    refundAmount: string;
+    feeAmount: string;
+  } | null>(null);
 
   // Mapeo de rarezas a imágenes
   const rarityToImage = {
@@ -157,6 +168,44 @@ export default function NFTPage() {
     } finally {
       setListing(false);
     }
+  };
+
+  // NUEVA: Manejar burn de NFT
+  const handleBurnNFT = async () => {
+    if (!burnTokenId) return;
+
+    const confirmBurn = confirm(
+      `🔥 ¿Estás seguro de que quieres quemar este NFT?\n\n` +
+      `Recibirás: ${burnInfo?.refundAmount} CYC\n` +
+      `Fee: ${burnInfo?.feeAmount} CYC (${(burnInfo?.feePercentage || 0) / 100}%)\n\n` +
+      `⚠️ Esta acción NO SE PUEDE DESHACER`
+    );
+
+    if (!confirmBurn) return;
+
+    setBurning(true);
+    try {
+      const result = await burnNFT(burnTokenId);
+      if (result.success) {
+        alert(`✅ NFT quemado correctamente! Recibiste ${burnInfo?.refundAmount} CYC. Tx: ${result.txHash}`);
+        setBurnTokenId(null);
+        setBurnInfo(null);
+      } else {
+        alert(`❌ Error quemando NFT: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error inesperado:", error);
+      alert("❌ Error inesperado quemando NFT");
+    } finally {
+      setBurning(false);
+    }
+  };
+
+  // NUEVA: Abrir modal de burn
+  const openBurnModal = async (tokenId: bigint) => {
+    setBurnTokenId(tokenId);
+    const info = await getBurnInfo(tokenId);
+    setBurnInfo(info);
   };
 
   const getRarityColor = (rarity: number) => {
@@ -405,6 +454,13 @@ export default function NFTPage() {
                             <div className={`absolute top-2 right-2 px-2 py-1 bg-gradient-to-r ${getRarityColor(nft.rarity)} text-white text-xs font-bold rounded-full flex items-center`}>
                               {nft.rarityName}
                             </div>
+                            {/* NUEVO: Indicador de NFT activo en mapa */}
+                            {nft.isActiveOnMap && (
+                              <div className="absolute top-2 left-2 px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center">
+                                <MapPin className="w-3 h-3 mr-1" />
+                                En Mapa
+                              </div>
+                            )}
                           </div>
 
                           {/* NFT Info */}
@@ -419,21 +475,43 @@ export default function NFTPage() {
                               <p className="text-xs text-amber-600 mt-1 line-clamp-2">{rarityToDesc[nft.rarity].description}</p>
                             </div>
                             {nft.isActiveOnMap && (
-                              <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full inline-flex items-center">
+                              <div className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full inline-flex items-center">
                                 <MapPin className="w-3 h-3 mr-1" />
-                                Activo en mapa: {nft.location}
+                                Ubicación: {nft.location}
                               </div>
                             )}
                           </div>
 
                           {/* Actions */}
-                          <button
-                            onClick={() => setSelectedTokenId(nft.tokenId)}
-                            className="w-full px-4 py-2 bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 font-semibold rounded-lg hover:from-orange-500 hover:to-orange-400 transition-all flex items-center justify-center"
-                          >
-                            <Store className="w-4 h-4 mr-2" />
-                            Vender en Marketplace
-                          </button>
+                          <div className="space-y-2">
+                            {/* MODIFICADO: Botón de vender deshabilitado si está activo en mapa */}
+                            <button
+                              onClick={() => setSelectedTokenId(nft.tokenId)}
+                              disabled={nft.isActiveOnMap}
+                              className={`w-full px-4 py-2 font-semibold rounded-lg transition-all flex items-center justify-center ${
+                                nft.isActiveOnMap
+                                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                  : 'bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 hover:from-orange-500 hover:to-orange-400'
+                              }`}
+                            >
+                              <Store className="w-4 h-4 mr-2" />
+                              {nft.isActiveOnMap ? 'No se puede vender (En Mapa)' : 'Vender en Marketplace'}
+                            </button>
+
+                            {/* NUEVO: Botón para quemar NFT - deshabilitado si está activo en mapa */}
+                            <button
+                              onClick={() => openBurnModal(nft.tokenId)}
+                              disabled={nft.isActiveOnMap}
+                              className={`w-full px-4 py-2 font-semibold rounded-lg transition-all flex items-center justify-center ${
+                                nft.isActiveOnMap
+                                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                  : 'bg-gradient-to-r from-red-500 to-red-400 text-white hover:from-red-600 hover:to-red-500'
+                              }`}
+                            >
+                              <Flame className="w-4 h-4 mr-2" />
+                              {nft.isActiveOnMap ? 'No se puede quemar (En Mapa)' : 'Quemar por CYC'}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -498,6 +576,77 @@ export default function NFTPage() {
                     </div>
                   </div>
                 )}
+
+                {/* NUEVO: Burn NFT Modal */}
+                {burnTokenId && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-4">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-xl font-bold text-red-800 flex items-center">
+                          <Flame className="w-6 h-6 mr-2" />
+                          Quemar NFT #{burnTokenId.toString()}
+                        </h3>
+                        <button
+                          onClick={() => {
+                            setBurnTokenId(null);
+                            setBurnInfo(null);
+                          }}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      {/* Información de burn */}
+                      {burnInfo && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-2">
+                          <div className="flex items-center text-red-800 text-sm font-semibold">
+                            <Info className="w-4 h-4 mr-2" />
+                            Información del quemado:
+                          </div>
+                          <div className="text-sm space-y-1">
+                            <p><strong>Valor del NFT:</strong> {burnInfo.nftValue} CYC</p>
+                            <p><strong>Fee ({burnInfo.feePercentage / 100}%):</strong> {burnInfo.feeAmount} CYC</p>
+                            <p className="text-green-700"><strong>Recibirás:</strong> {burnInfo.refundAmount} CYC</p>
+                          </div>
+                          <div className="bg-yellow-100 border border-yellow-400 rounded p-2 mt-2">
+                            <div className="flex items-center text-yellow-800 text-xs">
+                              <AlertTriangle className="w-4 h-4 mr-1" />
+                              <strong>¡ADVERTENCIA!</strong>
+                            </div>
+                            <p className="text-yellow-800 text-xs mt-1">
+                              Esta acción NO SE PUEDE DESHACER. El NFT será destruido permanentemente.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={() => {
+                            setBurnTokenId(null);
+                            setBurnInfo(null);
+                          }}
+                          className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          onClick={handleBurnNFT}
+                          disabled={burning || !burnInfo}
+                          className="flex-1 px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        >
+                          {burning ? (
+                            <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                          ) : (
+                            <Flame className="w-4 h-4 mr-2" />
+                          )}
+                          {burning ? "Quemando..." : "Confirmar Quemado"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -531,7 +680,7 @@ export default function NFTPage() {
                       const priceInCYC = parseFloat((Number(listing.price) / 1e18).toFixed(2));
                       const isExpired = Number(listing.expiresAt) * 1000 < Date.now();
                       
-                      // AQUÍ ESTÁ LA CORRECCIÓN: usar la rareza real del listing
+                      // Usar la rareza real del listing
                       const nftRarity = listing.rarity || Rarity.BabyCapy;
                       
                       return (
