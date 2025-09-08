@@ -16,8 +16,8 @@ contract CapyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Reentra
     // Contador de tokens
     uint256 private _nextTokenId = 1;
     
-    // Fee del contrato (5% por defecto)
-    uint256 public feePercentage = 500; // 5% = 500 basis points (500/10000)
+    // Fee del contrato (escalonado basado en valor del NFT)
+    // Se eliminó feePercentage fijo, ahora se calcula dinámicamente
     
     // Dirección donde se acumulan los fees
     address public feeRecipient;
@@ -46,14 +46,20 @@ contract CapyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Reentra
     // Mapeo de token ID a coordenadas (para tracking)
     mapping(uint256 => string) public tokenLocation;
     
+    // Mapeo de token ID a minter original
+    mapping(uint256 => address) public tokenOriginalMinter;
+    
+    // NUEVO: Mapeo para rastrear quien distribuyó cada NFT
+    mapping(uint256 => address) public tokenDistributor;
+    
     // Eventos
     event NFTMinted(address indexed to, uint256 indexed tokenId, Rarity rarity, uint256 price);
     event NFTDistributed(uint256 indexed tokenId, string location, address indexed owner);
-    event NFTClaimed(uint256 indexed tokenId, address indexed from, address indexed to, string location);
+    event NFTClaimed(uint256 indexed tokenId, address indexed claimer, uint256 rewardAmount, uint256 feeAmount);
+    event NFTBurned(uint256 indexed tokenId, address indexed owner, uint256 refundAmount, uint256 feeAmount);
     event PriceUpdated(Rarity rarity, uint256 newPrice);
     event URIUpdated(Rarity rarity, string newURI);
-    event FeeUpdated(uint256 newFeePercentage);
-    event FeesWithdrawn(address indexed to, uint256 amount);
+    event FeeRecipientUpdated(address newFeeRecipient);
 
     constructor(
         address _capyCoinToken,
@@ -79,6 +85,22 @@ contract CapyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Reentra
     }
 
     /**
+     * @dev Calcular fee de burn basado en el valor del NFT (escalonado)
+     * - NFTs ≤ 5 CYC: 3% fee
+     * - NFTs ≤ 20 CYC: 5% fee  
+     * - NFTs > 20 CYC: 7% fee
+     */
+    function getBurnFeePercentage(uint256 nftValue) public pure returns (uint256) {
+        if (nftValue <= 5 * 10**18) {        // ≤ 5 CYC
+            return 300;  // 3% = 300 basis points
+        } else if (nftValue <= 20 * 10**18) { // ≤ 20 CYC  
+            return 500;  // 5% = 500 basis points
+        } else {                              // > 20 CYC
+            return 700;  // 7% = 700 basis points
+        }
+    }
+
+    /**
      * @dev Mintear un NFT pagando con CapyCoins
      */
     function mintNFT(Rarity rarity) external nonReentrant returns (uint256) {
@@ -94,15 +116,6 @@ contract CapyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Reentra
             "CapyCoin transfer failed"
         );
         
-        // Calcular y transferir fee
-        uint256 fee = (price * feePercentage) / 10000;
-        if (fee > 0) {
-            require(
-                capyCoinToken.transfer(feeRecipient, fee),
-                "Fee transfer failed"
-            );
-        }
-        
         // Mintear NFT
         uint256 tokenId = _nextTokenId++;
         _safeMint(msg.sender, tokenId);
@@ -110,6 +123,9 @@ contract CapyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Reentra
         // Configurar metadatos
         tokenRarity[tokenId] = rarity;
         _setTokenURI(tokenId, rarityURIs[rarity]);
+        
+        // Registrar el minter original
+        tokenOriginalMinter[tokenId] = msg.sender;
         
         emit NFTMinted(msg.sender, tokenId, rarity, price);
         return tokenId;
@@ -124,33 +140,65 @@ contract CapyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Reentra
         
         tokenActiveOnMap[tokenId] = true;
         tokenLocation[tokenId] = location;
+        tokenDistributor[tokenId] = msg.sender; // NUEVO: Registrar quien distribuyó
         
         emit NFTDistributed(tokenId, location, msg.sender);
     }
 
     /**
-     * @dev Reclamar NFT del mapa (función para el backend/oracle)
+     * @dev Reclamar NFT del mapa - VERSIÓN CORREGIDA
+     * Ahora CUALQUIER PERSONA puede reclamar NFTs distribuidos en el mapa
      */
-    function claimNFT(uint256 tokenId, address newOwner, string memory location) external onlyOwner {
+    function claimNFT(uint256 tokenId) external nonReentrant {
         require(tokenActiveOnMap[tokenId], "NFT not active on map");
         address currentOwner = ownerOf(tokenId);
         
-        // Calcular fee de reclamación (2%)
-        uint256 claimFee = (rarityPrices[tokenRarity[tokenId]] * 200) / 10000; // 2%
+        // Impedir que el dueño actual se reclame a sí mismo
+        require(msg.sender != currentOwner, "Cannot claim your own NFT");
         
-        // Transferir NFT
-        _transfer(currentOwner, newOwner, tokenId);
+        // Transferir el NFT al reclamante (Bob)
+        _transfer(currentOwner, msg.sender, tokenId);
         
-        // Desactivar del mapa
+        // Desactivar del mapa y limpiar datos
         tokenActiveOnMap[tokenId] = false;
         tokenLocation[tokenId] = "";
+        tokenDistributor[tokenId] = address(0);
         
-        // Si hay balance de CapyCoins en el contrato, transferir fee
-        if (capyCoinToken.balanceOf(address(this)) >= claimFee && claimFee > 0) {
-            capyCoinToken.transfer(feeRecipient, claimFee);
-        }
+        // Emitir evento sin recompensa económica
+        emit NFTClaimed(tokenId, msg.sender, 0, 0);
+    }
+
+    /**
+     * @dev Quemar NFT y recibir el porcentaje correspondiente de su valor en CapyCoins
+     * Fee escalonado: 3% para NFTs ≤5 CYC, 5% para ≤20 CYC, 7% para >20 CYC
+     */
+    function burnNFT(uint256 tokenId) external nonReentrant {
+        require(ownerOf(tokenId) == msg.sender, "Not the owner of this NFT");
+        require(!tokenActiveOnMap[tokenId], "NFT is active on map; cannot burn");
+
+        uint256 nftValue = rarityPrices[tokenRarity[tokenId]];
+        uint256 currentFeePercentage = getBurnFeePercentage(nftValue);
+        uint256 refundAmount = (nftValue * (10000 - currentFeePercentage)) / 10000;
+        uint256 feeAmount = (nftValue * currentFeePercentage) / 10000;
+
+        // Verificar que el contrato tenga suficientes CapyCoins
+        require(capyCoinToken.balanceOf(address(this)) >= refundAmount + feeAmount, "Insufficient contract balance");
+
+        // Transferir CapyCoins del contrato al dueño
+        require(
+            capyCoinToken.transfer(msg.sender, refundAmount),
+            "Refund transfer failed"
+        );
+        // Transferir fee al feeRecipient
+        require(
+            capyCoinToken.transfer(feeRecipient, feeAmount),
+            "Fee transfer failed"
+        );
+
+        // Quemar el NFT
+        _burn(tokenId);
         
-        emit NFTClaimed(tokenId, currentOwner, newOwner, location);
+        emit NFTBurned(tokenId, msg.sender, refundAmount, feeAmount);
     }
 
     /**
@@ -177,6 +225,25 @@ contract CapyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Reentra
     }
 
     /**
+     * @dev Obtener información de burn fee para un NFT específico
+     */
+    function getBurnInfo(uint256 tokenId) external view returns (
+        uint256 nftValue,
+        uint256 feePercentage,
+        uint256 refundAmount,
+        uint256 feeAmount
+    ) {
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
+        
+        nftValue = rarityPrices[tokenRarity[tokenId]];
+        feePercentage = getBurnFeePercentage(nftValue);
+        refundAmount = (nftValue * (10000 - feePercentage)) / 10000;
+        feeAmount = (nftValue * feePercentage) / 10000;
+        
+        return (nftValue, feePercentage, refundAmount, feeAmount);
+    }
+
+    /**
      * @dev Obtener todos los NFTs de un usuario
      */
     function getUserNFTs(address user) external view returns (uint256[] memory) {
@@ -194,8 +261,8 @@ contract CapyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Reentra
      * @dev Obtener NFTs activos en el mapa
      */
     function getActiveNFTs() external view returns (uint256[] memory) {
-        uint256 totalSupply = totalSupply();
-        uint256[] memory activeTokens = new uint256[](totalSupply);
+        uint256 totalTokens = totalSupply();
+        uint256[] memory activeTokens = new uint256[](totalTokens);
         uint256 activeCount = 0;
         
         for (uint256 i = 1; i < _nextTokenId; i++) {
@@ -235,39 +302,20 @@ contract CapyNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Reentra
     }
 
     /**
-     * @dev Actualizar porcentaje de fee
-     */
-    function updateFeePercentage(uint256 newFeePercentage) external onlyOwner {
-        require(newFeePercentage <= 1000, "Fee cannot exceed 10%");
-        feePercentage = newFeePercentage;
-        emit FeeUpdated(newFeePercentage);
-    }
-
-    /**
      * @dev Actualizar destinatario de fees
      */
     function updateFeeRecipient(address newFeeRecipient) external onlyOwner {
         require(newFeeRecipient != address(0), "Invalid address");
         feeRecipient = newFeeRecipient;
+        emit FeeRecipientUpdated(newFeeRecipient);
     }
 
     /**
-     * @dev Retirar CapyCoins acumulados en el contrato
+     * @dev Retirar tokens ERC20 accidentalmente enviados (excepto CapyCoin)
      */
-    function withdrawCapyCoins() external onlyOwner {
-        uint256 balance = capyCoinToken.balanceOf(address(this));
-        require(balance > 0, "No CapyCoins to withdraw");
-        
-        require(capyCoinToken.transfer(owner(), balance), "Transfer failed");
-        emit FeesWithdrawn(owner(), balance);
-    }
-
-    /**
-     * @dev Función de emergencia para retirar cantidad específica
-     */
-    function emergencyWithdraw(uint256 amount) external onlyOwner {
-        require(capyCoinToken.balanceOf(address(this)) >= amount, "Insufficient balance");
-        require(capyCoinToken.transfer(owner(), amount), "Transfer failed");
+    function withdrawERC20(IERC20 token, address to, uint256 amount) external onlyOwner {
+        require(address(token) != address(capyCoinToken), "Cannot withdraw CapyCoin");
+        require(token.transfer(to, amount), "Transfer failed");
     }
 
     // ========================================
