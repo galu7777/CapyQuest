@@ -2,83 +2,89 @@
   <img height="400" src="./capy-quest-app/src/assets/capyquest.png" alt="CapyQuest Logo"/>
 </p>
 
-CapyQuest es un proyecto **Web3** construido con **Solidity** para los smart contracts y **Next.js** para el frontend.  
-Nuestro objetivo es crear un ecosistema divertido e interactivo alrededor de **CapyCoin**, combinando blockchain, geolocalización y futuras integraciones de AR.  
+CapyQuest es un proyecto **Web3** desarrollado con **Solidity** para los smart contracts y **Next.js** para el frontend.  
+Nuestra misión es crear un ecosistema divertido e interactivo alrededor de **CapyCoin**, combinando blockchain, geolocalización y próximas integraciones de **AR (Realidad Aumentada)**.  
 
 🌍 Website: [CapyQuest](https://capy-quest.vercel.app/)
 
 ---
 
-## 🚀 Funciones Actuales (Stage 1 y 2)
+## 🖼 NFTs por Rareza
 
-- Smart contracts desplegados en **Avalanche Fuji Testnet**:  
-  - **CapyCoin (ERC-20)**  
-  - **CapyNFT (ERC-721)**  
-  - **Marketplace**  
-- Frontend con **Next.js**  
-- Comprar CapyCoins con facilidad  
-- **Distribución de NFTs en el mapa**: por punto exacto o aleatoria dentro de un perímetro  
-- **Reclamo de NFTs** cerca del punto asignado (radio de 10 m, en testing 150 m)  
-- **Marketplace**: vender o quemar NFTs para obtener CapyCoins  
-- 5 rarezas de NFTs ya implementadas: Baby, Explore, Wise, Legendary, Golden  
+<p align="left">
+  <img height="100" src="./capy-quest-app/src/assets/NFTs/BabyCapy.png" alt="BabyCapy"/>
+  <img height="100" src="./capy-quest-app/src/assets/NFTs/ExploreCapy.png" alt="ExploreCapy"/>
+  <img height="100" src="./capy-quest-app/src/assets/NFTs/WiseCapy.png" alt="WiseCapy"/>
+  <img height="100" src="./capy-quest-app/src/assets/NFTs/LegendaryCapy.png" alt="LegendaryCapy"/>
+  <img height="100" src="./capy-quest-app/src/assets/NFTs/GoldenCapy.png" alt="GoldenCapy"/>
+</p>
 
 ---
 
-## 🖼 Rutas de imágenes de NFTs
-
-| Rareza       | Imagen |
-|-------------|-------|
-| BabyCapy     | `./capy-quest-app/src/assets/NFTs/BabyCapy.png` |
-| ExploreCapy  | `./capy-quest-app/src/assets/NFTs/ExploreCapy.png` |
-| WiseCapy     | `./capy-quest-app/src/assets/NFTs/WiseCapy.png` |
-| LegendaryCapy| `./capy-quest-app/src/assets/NFTs/LegendaryCapy.png` |
-| GoldenCapy   | `./capy-quest-app/src/assets/NFTs/GoldenCapy.png` |
-
----
-
-## 💰 Modelo Económico de Cazatesoros
-
-### 🎯 Claim (Reclamar)
-- **Gratis** para cualquier jugador  
-- Solo se puede reclamar un NFT si estás físicamente cerca del punto  
-- No se puede reclamar tu propio NFT  
-
-### 🔥 Burn (Convertir a CapyCoin)
-- Al **quemar** un NFT, recibes **97% de su valor en CapyCoin**  
-- **3% de fee** va al `feeRecipient`  
-- Cada rareza tiene su propio valor en CapyCoin:  
-
-| Rareza       | Valor en CapyCoin al mintear | Valor al quemar (97%) |
-|-------------|----------------------------|----------------------|
-| BabyCapy     | 1 CYC                       | 0.97 CYC             |
-| ExploreCapy  | 5 CYC                       | 4.85 CYC             |
-| WiseCapy     | 10 CYC                      | 9.7 CYC              |
-| LegendaryCapy| 20 CYC                      | 19.4 CYC             |
-| GoldenCapy   | 100 CYC                     | 97 CYC               |
-
-### 🏦 Reserva del Contrato
-- Los CapyCoins se acumulan al mintear NFTs  
-- Solo se liberan al quemar NFTs (con fee aplicado)  
-- No hay retiro directo de CapyCoins del contrato  
-
-### 🎮 Incentivos del Juego
-- **Distribuir**: los jugadores reparten NFTs para interactuar con su audiencia  
-- **Explorar**: otros jugadores buscan y reclaman NFTs gratis  
-- **Convertir**: usuarios queman NFTs cuando necesitan liquidez  
-- Objetivo: siempre que el jugador gane algo, el repartidor genere engagement significativo con su comunidad  
-
-💡 Ejemplo de uso:  
-- Una marca distribuye NFTs dentro de un perímetro en su ciudad  
-- Los usuarios caminan, buscan y reclaman los NFTs  
-- Los NFT pueden ser vendidos o quemados por CapyCoins  
-- Se genera **FOMO real** y engagement sin gastar publicidad tradicional  
+## 🚀 Funcionalidades Actuales (Stage 1)
+- Smart contracts escritos en **Solidity** para CapyCoin (ERC-20) y CapyNFT (ERC-721).  
+- Frontend funcional en **Next.js**.  
+- Comprar CapyCoins y mintear NFTs.  
+- Distribución de NFTs en el mapa de manera **puntual o aleatoria**.  
+- Reclamar NFTs cerca de su ubicación en el mapa.  
+- NFTs pueden **venderse en el marketplace** o **quemarse para obtener CapyCoins**.  
+- 5 rarezas de NFTs disponibles: Baby, Explore, Wise, Legendary, Golden.  
+- Contratos desplegados en la **testnet Fuji** de Avalanche.  
 
 ---
 
-## 📌 Roadmap AR y Futuro
-- Mejoras en **AR** para hacer la experiencia más inmersiva  
-- Gamificación del mapa y rarezas en tiempo real  
-- Expandir la economía y las interacciones entre jugadores y marcas  
+## 🛠 Próximas Funciones (Stage 2)
+- **Marketplace completo**: compra, venta e intercambio de NFTs usando CapyCoin.  
+- **Integración AR**: experiencia inmersiva para encontrar y reclamar NFTs.  
+- **Geospatial avanzado**: exploración de NFTs con radio de reclamo definido (10m en staging, 150m en testing).  
+
+---
+
+## 🎯 Resumen del Modelo Económico
+
+### Cazatesoros (Claim) - **GRATUITO**
+- Cualquier persona puede reclamar NFTs distribuidos sin costo.  
+- Solo necesita estar físicamente cerca del NFT.  
+- No puede reclamar sus propios NFTs distribuidos.  
+
+### Conversión a CapyCoin (Burn) - **Fee variable según rareza**
+- Al quemar un NFT, el usuario recibe el **valor del NFT en CapyCoins menos el fee**.  
+- Fee según el valor del NFT:
+  - ≤ 5 CYC → 3%  
+  - ≤ 20 CYC → 5%  
+  - > 20 CYC → 7%  
+- Este fee se transfiere al `feeRecipient`.  
+- Única forma de retirar CapyCoins del contrato.  
+
+### Reserva del Contrato
+- CapyCoins se acumulan en el contrato al mintear NFTs.  
+- Solo se liberan al quemar NFTs con fee.  
+- No hay retiro directo de CapyCoins.  
+
+### Incentivos del Juego
+- **Distribuir**: jugadores reparten NFTs en el mapa para interactuar con su audiencia.  
+- **Explorar**: los cazatesoros buscan NFTs para reclamarlos gratis.  
+- **Convertir**: usuarios queman NFTs para obtener liquidez según el fee variable.  
+
+💡 Este modelo crea un ciclo económico sustentable:  
+- NFTs mantienen su valor.  
+- Incentivo constante para explorar y reclamar.  
+- Los ingresos del protocolo provienen solo de conversiones a CapyCoin.  
+- Sin inflación descontrolada.  
+
+---
+
+## 📌 Roadmap
+
+- **Semana 1**:  
+  - Contrato CapyCoin funcional.  
+  - Comprar y mintear NFTs.  
+  - Publicar repositorio y roadmap.  
+
+- **Semana 2**:  
+  - Marketplace y trading de NFTs.  
+  - Geospatial features avanzadas.  
+  - Integración AR.  
 
 ---
 
@@ -89,14 +95,11 @@ Nuestro objetivo es crear un ecosistema divertido e interactivo alrededor de **C
 
 ---
 
-## 🤝 Contribuyendo
+## 🤝 Contribuciones
 ¡Contribuidores bienvenidos!  
-Revisa el [repo](https://github.com/tu-usuario/capy-quest-app) y la roadmap para empezar.  
+Consulta nuestro roadmap y repositorio para comenzar.  
 
 ---
 
 <!-- ## 📧 Contacto
-Visítanos en [CapyQuest](https://capy-quest.vercel.app/)  -->
-
-
----
+Visítanos en [CapyQuest](https://capy-quest.vercel.app/) -->
