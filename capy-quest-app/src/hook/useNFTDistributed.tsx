@@ -290,39 +290,6 @@ export function useNFTDistributed() {
     }
   }, [ready, authenticated, user, loadUserNFTs, loadDistributedNFTs]);
 
-  // Generar ubicación aleatoria dentro de un polígono
-  const generateRandomLocationInPolygon = useCallback((polygon: Coordinates[]): string => {
-    if (polygon.length < 3) {
-      throw new Error("El polígono necesita al menos 3 puntos");
-    }
-
-    // Encontrar los límites del polígono
-    let minLng = polygon[0].lng;
-    let maxLng = polygon[0].lng;
-    let minLat = polygon[0].lat;
-    let maxLat = polygon[0].lat;
-
-    polygon.forEach(point => {
-      minLng = Math.min(minLng, point.lng);
-      maxLng = Math.max(maxLng, point.lng);
-      minLat = Math.min(minLat, point.lat);
-      maxLat = Math.max(maxLat, point.lat);
-    });
-
-    // Generar puntos aleatorios hasta encontrar uno dentro del polígono
-    let randomLng: number, randomLat: number;
-    let isInside = false;
-
-    while (!isInside) {
-      randomLng = minLng + Math.random() * (maxLng - minLng);
-      randomLat = minLat + Math.random() * (maxLat - minLat);
-
-      isInside = isPointInPolygon({ lng: randomLng, lat: randomLat }, polygon);
-    }
-
-    return `${randomLat.toFixed(6)},${randomLng.toFixed(6)}`;
-  }, []);
-
   // Verificar si un punto está dentro de un polígono
   const isPointInPolygon = useCallback((point: Coordinates, polygon: Coordinates[]): boolean => {
     const x = point.lng;
@@ -342,6 +309,39 @@ export function useNFTDistributed() {
     
     return inside;
   }, []);
+
+  // Generar ubicación aleatoria dentro de un polígono
+  const generateRandomLocationInPolygon = useCallback((polygon: Coordinates[]): string => {
+  if (polygon.length < 3) {
+  throw new Error("El polígono necesita al menos 3 puntos");
+  }
+
+  // Encontrar los límites del polígono
+  let minLng = polygon[0].lng;
+  let maxLng = polygon[0].lng;
+  let minLat = polygon[0].lat;
+  let maxLat = polygon[0].lat;
+
+  polygon.forEach(point => {
+  minLng = Math.min(minLng, point.lng);
+  maxLng = Math.max(maxLng, point.lng);
+  minLat = Math.min(minLat, point.lat);
+  maxLat = Math.max(maxLat, point.lat);
+  });
+
+  let randomLng = 0;
+  let randomLat = 0;
+  let isInside = false;
+
+  // Se ejecuta al menos una vez, garantizando asignación
+  do {
+  randomLng = minLng + Math.random() * (maxLng - minLng);
+  randomLat = minLat + Math.random() * (maxLat - minLat);
+  isInside = isPointInPolygon({ lng: randomLng, lat: randomLat }, polygon);
+  } while (!isInside);
+
+  return `${randomLat.toFixed(6)},${randomLng.toFixed(6)}`;
+  }, [isPointInPolygon]);
 
   // Calcular distancia entre dos puntos en metros
   const calculateDistance = useCallback((point1: Coordinates, point2: Coordinates): number => {

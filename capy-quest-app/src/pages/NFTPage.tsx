@@ -320,7 +320,7 @@ export default function NFTPage() {
                 {/* Rarity Selection */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   {Object.entries(RarityNames).map(([rarityValue, name]) => {
-                    const rarity = parseInt(rarityValue) as Rarity;
+                    const rarity = parseInt(rarityValue) as typeof Rarity[keyof typeof Rarity];
                     const price = RarityPrices[rarity];
                     const isSelected = selectedRarity === rarity;
                     

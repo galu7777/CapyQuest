@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { MapPin, Navigation, Save, Trash2, Play, ChartNetwork, 
-  Loader, AlertCircle, Trophy, Zap, Target, Users, Map as MapIcon, Plus, X, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'
-import Map, { Marker, Popup, Source, Layer } from 'react-map-gl/mapbox'
+import { MapPin, Navigation, Trash2, Play, ChartNetwork, 
+  Loader, Trophy, Zap, Target, Map as MapIcon, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'
+import Map, { Marker, Source, Layer } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useNFTDistributed } from '@/hook/useNFTDistributed'
 import Image from 'next/image'
 import Capy from "@/assets/capy-white.png"
+import type { Feature, FeatureCollection, Polygon } from 'geojson'
 
 // Importar las descripciones de NFTs
 import { descNFTs } from '@/constant/descNFTs'
@@ -72,12 +73,12 @@ export default function TreasureZoneImproved() {
   const [distributionMode, setDistributionMode] = useState<'single' | 'polygon'>('single')
   const [selectedNFTs, setSelectedNFTs] = useState<bigint[]>([])
   const [showNFTSelector, setShowNFTSelector] = useState(false)
-  const [selectedPolygonForDistribution, setSelectedPolygonForDistribution] = useState<PolygonData | null>(null)
+  //const [selectedPolygonForDistribution, setSelectedPolygonForDistribution] = useState<PolygonData | null>(null)
   
   // Estados de UI
   const [activeTab, setActiveTab] = useState<'distribute' | 'polygons' | 'active'>('distribute')
   const [locationError, setLocationError] = useState<string | null>(null)
-  const [isGettingLocation, setIsGettingLocation] = useState(false)
+  //const [isGettingLocation, setIsGettingLocation] = useState(false)
   const [pendingClickLocation, setPendingClickLocation] = useState<Coordinates | null>(null)
   const [showDistributionMenu, setShowDistributionMenu] = useState(false)
   const [selectedNFT, setSelectedNFT] = useState<any>(null)
@@ -104,7 +105,7 @@ export default function TreasureZoneImproved() {
       return
     }
 
-    setIsGettingLocation(true)
+    //setIsGettingLocation(true)
     setLocationError(null)
 
     const options = {
@@ -126,12 +127,12 @@ export default function TreasureZoneImproved() {
         latitude: coords.lat,
         zoom: 16
       }))
-      setIsGettingLocation(false)
+      //setIsGettingLocation(false)
       setLocationError(null)
     }
 
     const onError = (error: GeolocationPositionError) => {
-      setIsGettingLocation(false)
+      //setIsGettingLocation(false)
       setLocationError('No se pudo obtener la ubicación: ' + error.message)
     }
 
@@ -204,7 +205,7 @@ export default function TreasureZoneImproved() {
       }
       alert(`${selectedNFTs.length} NFT(s) distribuidos aleatoriamente en ${polygon.name}!`)
       setSelectedNFTs([])
-      setSelectedPolygonForDistribution(null)
+      //setSelectedPolygonForDistribution(null)
     } catch (error) {
       alert('Error durante la distribución: ' + (error instanceof Error ? error.message : 'Unknown error'))
     }
@@ -330,19 +331,22 @@ export default function TreasureZoneImproved() {
   }
 
   // Generar GeoJSON para polígonos guardados
-  const getSavedPolygonsGeoJSON = () => {
-    return savedPolygons.map(polygon => ({
-      type: 'Feature',
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[...polygon.coordinates.map(coord => [coord.lng, coord.lat]), [polygon.coordinates[0].lng, polygon.coordinates[0].lat]]]
-      },
-      properties: {
-        name: polygon.name,
-        id: polygon.id
-      }
-    }))
-  }
+  const getSavedPolygonsGeoJSON = (): Feature<Polygon>[] => {
+  return savedPolygons.map(polygon => ({
+    type: "Feature", // 👈 importante que sea string literal
+    geometry: {
+      type: "Polygon",
+      coordinates: [[
+        ...polygon.coordinates.map(coord => [coord.lng, coord.lat]),
+        [polygon.coordinates[0].lng, polygon.coordinates[0].lat] // cierre del polígono
+      ]]
+    },
+    properties: {
+      name: polygon.name,
+      id: polygon.id
+    }
+  }))
+}
 
   // Vista de detalle del NFT
   if (showNFTDetail && selectedNFT) {
@@ -486,9 +490,9 @@ export default function TreasureZoneImproved() {
               id="saved-polygons"
               type="geojson"
               data={{
-                type: 'FeatureCollection',
+                type: "FeatureCollection",
                 features: getSavedPolygonsGeoJSON()
-              }}
+              } as FeatureCollection}
             >
               <Layer
                 id="saved-polygons-layer"
