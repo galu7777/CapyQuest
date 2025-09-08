@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { MapPin, Navigation, Save, Trash2, Play, Square, 
+import { MapPin, Navigation, Save, Trash2, Play, ChartNetwork, 
   Loader, AlertCircle, Trophy, Zap, Target, Users, Map as MapIcon, Plus, X, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'
 import Map, { Marker, Popup, Source, Layer } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -267,7 +267,7 @@ export default function TreasureZoneImproved() {
     const nftLocation = { lat, lng }
     const distance = calculateDistance(userLocation, nftLocation)
     
-    if (distance > 10) {
+    if (distance > 100) {
       alert(`Estás a ${distance.toFixed(2)} metros del NFT. Debes estar dentro de 10 metros para reclamarlo.`)
       return
     }
@@ -292,7 +292,7 @@ export default function TreasureZoneImproved() {
     const nftLocation = { lat, lng }
     const distance = calculateDistance(userLocation, nftLocation)
     
-    if (distance <= 10) {
+    if (distance <= 100) {
       setSelectedNFT(nft)
       setShowNFTDetail(true)
     } else {
@@ -420,7 +420,7 @@ export default function TreasureZoneImproved() {
         <div className="flex rounded-xl bg-amber-50 p-1">
           {[
             { id: 'distribute', label: 'Distribuir', icon: Target },
-            { id: 'polygons', label: 'Perímetros', icon: Square },
+            { id: 'polygons', label: 'Perímetros', icon: ChartNetwork },
             { id: 'active', label: 'En Mapa', icon: MapIcon }
           ].map(({ id, label, icon: Icon }) => (
             <button
@@ -607,7 +607,7 @@ export default function TreasureZoneImproved() {
                       : 'border-gray-300 bg-white text-gray-700'
                   }`}
                 >
-                  <Square className="w-4 h-4" />
+                  <ChartNetwork className="w-4 h-4" />
                   <span className="text-xs">Perímetro</span>
                 </button>
               </div>
