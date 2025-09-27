@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { createPublicClient, http, createWalletClient, custom } from "viem";
-import { avalancheFuji } from "viem/chains";
+import { moonbaseAlpha } from "viem/chains";
 import capyCoinAbi from "./abis/capyCoinAbi.json";
 import capyNFTAbi from "./abis/capyNFTAbi.json";
 import capyMarketplaceAbi from "./abis/capyMarketplaceAbi.json";
@@ -15,7 +15,7 @@ export const nftContractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_NFT!;
 export const marketplaceContractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MARKETPLACE!;
 
 export const publicClient = createPublicClient({
-  chain: avalancheFuji,
+  chain: moonbaseAlpha,
   transport: http(process.env.NEXT_PUBLIC_RPC_URL!),
 });
 
@@ -26,7 +26,7 @@ interface WalletProvider {
 
 export const getWalletClient = (wallet: WalletProvider) => {
   return createWalletClient({
-    chain: avalancheFuji,
+    chain: moonbaseAlpha,
     transport: custom(wallet)
   });
 };

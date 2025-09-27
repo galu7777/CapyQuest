@@ -268,8 +268,9 @@ export default function TreasureZoneImproved() {
     const nftLocation = { lat, lng }
     const distance = calculateDistance(userLocation, nftLocation)
     
-    if (distance > 100) {
-      alert(`Estás a ${distance.toFixed(2)} metros del NFT. Debes estar dentro de 10 metros para reclamarlo.`)
+    if (distance > 150000) {
+      console.log('Distance:', distance)
+      alert(`Estás a ${distance.toFixed(2)} metros del NFT. Debes estar dentro de 1 metros para reclamarlo.`)
       return
     }
 
@@ -293,11 +294,11 @@ export default function TreasureZoneImproved() {
     const nftLocation = { lat, lng }
     const distance = calculateDistance(userLocation, nftLocation)
     
-    if (distance <= 100) {
+    if (distance <= 150000) {
       setSelectedNFT(nft)
       setShowNFTDetail(true)
     } else {
-      alert(`Estás a ${distance.toFixed(2)} metros del NFT. Debes estar dentro de 10 metros para interactuar con él.`)
+      alert(`Estás a ${distance.toFixed(2)} metros del NFT. Debes estar dentro de 1 metros para interactuar con él.`)
     }
   }
 

@@ -9,7 +9,7 @@ import capyquest from "@/assets/CYC-r.png";
 import { Coins, Network, RefreshCw, Download, Plus, LogOut, Store, User, Wallet, Star, Map } from "lucide-react";
 
 export default function BuyCapyCoins() {
-  const { wallet, loading, buyCapyCoins, reload, switchToAvalancheFuji, addTokenToMetaMask } = useWallet();
+  const { wallet, loading, buyCapyCoins, reload, switchToMoonbaseAlpha, addTokenToMetaMask } = useWallet();
   const { ready, authenticated, login, logout, user } = usePrivy();
   const router = useRouter();
   
@@ -23,7 +23,7 @@ export default function BuyCapyCoins() {
     }
     
     if (!ethAmount || parseFloat(ethAmount) <= 0) {
-      alert("❌ Ingresa una cantidad válida de AVAX");
+      alert("❌ Ingresa una cantidad válida de DEV");
       return;
     }
 
@@ -122,7 +122,7 @@ export default function BuyCapyCoins() {
               <div>
                 <label className="block text-sm font-semibold text-amber-800 mb-3 flex items-center">
                   <Coins className="w-4 h-4 mr-1" />
-                  Cantidad de AVAX a enviar:
+                  Cantidad de DEV a enviar:
                 </label>
                 <input
                   type="number"
@@ -143,7 +143,7 @@ export default function BuyCapyCoins() {
                     Recibirás aproximadamente: <span className="text-yellow-600 ml-1">{getTokensEstimate()} CYC</span>
                   </div>
                   <div className="text-sm text-amber-700 mt-1 flex items-center justify-center">
-                    (1 AVAX = 10 CYC)
+                    (1 DEV = 10 CYC)
                   </div>
                 </div>
               )}
@@ -171,11 +171,11 @@ export default function BuyCapyCoins() {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 key="switch-network"
-                onClick={switchToAvalancheFuji}
+                onClick={switchToMoonbaseAlpha}
                 className="font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-orange-400 to-orange-300 text-amber-900 hover:from-orange-500 hover:to-orange-400 shadow-md hover:shadow-lg px-4 py-3 text-sm flex items-center justify-center"
               >
                 <Network className="w-4 h-4 mr-2" />
-                Avalanche Fuji
+                Moonbase Alpha
               </button>
               <button
                 key="reload-wallet"

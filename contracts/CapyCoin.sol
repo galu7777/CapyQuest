@@ -8,7 +8,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CapyCoin is ERC20, Ownable, ERC20Permit {
     // Precio de CapyCoin en wei (1 AVAX = cantidad de CapyCoin)
-    uint256 public tokenPrice = 10; // 1 AVAX = 10 CYC
+    uint256 public tokenPrice = 1; // 1 dot = 1 CYC
     
     // Supply máximo de tokens - 100 millones
     uint256 public maxSupply = 100000000 * 10 ** decimals(); // 100 million tokens

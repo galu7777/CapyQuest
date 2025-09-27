@@ -52,14 +52,14 @@ export function useWallet() {
     }
   }, [ready, authenticated, user]);
 
-  // Función para cambiar a Avalanche Fuji
-  const switchToAvalancheFuji = useCallback(async () => {
+  // Función para cambiar a Moonbase Alpha
+  const switchToMoonbaseAlpha = useCallback(async () => {
     if (!window.ethereum) return false;
 
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0xA869" }], // 43113 en hexadecimal
+        params: [{ chainId: "0x507" }], // 1287 en hexadecimal
       });
       return true;
     } catch (switchError: unknown) {
@@ -74,15 +74,15 @@ export function useWallet() {
             method: "wallet_addEthereumChain",
             params: [
               {
-                chainId: "0xA869",
-                chainName: "Avalanche Fuji Testnet",
+                chainId: "0x507",
+                chainName: "Moonbase Alpha",
                 nativeCurrency: {
-                  name: "AVAX",
-                  symbol: "AVAX",
+                  name: "DEV",
+                  symbol: "DEV",
                   decimals: 18,
                 },
-                rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc"],
-                blockExplorerUrls: ["https://testnet.snowtrace.io/"],
+                rpcUrls: ["https://rpc.api.moonbase.moonbeam.network"],
+                blockExplorerUrls: ["https://moonbase.moonscan.io/"],
               },
             ],
           });
@@ -112,12 +112,12 @@ export function useWallet() {
         }
 
         const currentChainId = await window.ethereum.request({ method: "eth_chainId" });
-        if (currentChainId !== "0xA869") {
-          const switched = await switchToAvalancheFuji();
+        if (currentChainId !== "0x507") {
+          const switched = await switchToMoonbaseAlpha();
           if (!switched) {
             return {
               success: false,
-              error: "Debes cambiar a Avalanche Fuji Testnet en MetaMask",
+              error: "Debes cambiar a Moonbase Alpha en MetaMask",
             };
           }
           await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -189,7 +189,7 @@ export function useWallet() {
         setLoading(false);
       }
     },
-    [ready, authenticated, user, loadWallet, switchToAvalancheFuji]
+    [ready, authenticated, user, loadWallet, switchToMoonbaseAlpha]
   );
 
   // Agregar token a MetaMask
@@ -239,7 +239,7 @@ export function useWallet() {
     buyCapyCoins,
     reload: loadWallet,
     isConnected: authenticated && !!user?.wallet?.address,
-    switchToAvalancheFuji,
+    switchToMoonbaseAlpha,
     addTokenToMetaMask,
   };
 }
