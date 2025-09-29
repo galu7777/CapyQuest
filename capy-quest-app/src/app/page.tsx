@@ -1,12 +1,16 @@
 // app/page.tsx (página principal)
-// import BuyCapyCoins from "@/pages/BuyCapyCoins";
-import Landing from "@/pages/Landing";
+
+import Landing from "@/pages/Landing/Landing";
+import Carrusel from './../pages/Landing/Carrusel';
+import BuyCapyCoins from "@/pages/BuyCapyCoins";
+
 
 export default function Home() {
   return (
     <main>
       {/* <BuyCapyCoins /> */}
-      <Landing />
+       <Landing />
+      <Carrusel />
     </main>
   );
 }

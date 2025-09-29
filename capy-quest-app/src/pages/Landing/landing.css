@@ -362,13 +362,14 @@ section::before {
 }
 
 .tooltip .title h2 {
-  color: var(--dark-bg) !important;
+  color: var(--cream) !important;
   font-weight: 700;
 }
 
 .tooltip .description {
-  color: rgba(0, 0, 0, 0.8);
+  color: var(--cream) !important;
   font-weight: 300;
+  font-size: 1rem;
 }
 
 .tooltip:nth-child(2) .icon,
@@ -452,5 +453,35 @@ section::before {
 .model-container,
 .circular-mask {
   will-change: transform, opacity;
+}
+
+/* carrusel */
+/* Separación general entre cards */
+.carousel .card {
+  margin: 0 15px; /* separación horizontal */
+}
+
+/* Pantallas medianas: ≤991px */
+@media (max-width: 991px) {
+  .carousel .card {
+    width: 280px;
+    margin: 0 12px;
+  }
+}
+
+/* Tablets verticales: ≤768px */
+@media (max-width: 768px) {
+  .carousel .card {
+    width: 240px;
+    margin: 0 10px;
+  }
+}
+
+/* Móviles: ≤576px */
+@media (max-width: 576px) {
+  .carousel .card {
+    width: 100px;
+    margin: 0 8px;
+  }
 }
 

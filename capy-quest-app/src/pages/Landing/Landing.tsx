@@ -273,38 +273,32 @@ export default function Landing() {
       </section>
 
       <section className="product-overview">
-        <div className="header-1 text-black"><h1>Every Rep Starts With</h1></div>
-        <div className="header-2"><h1>GRND shaker</h1></div>
+        <div className="header-1 text-black"><h1>Impulsa tu negocio</h1></div>
+        {/* <div className="header-2"><h1>GRND shaker</h1></div> */}
         <div className="circular-mask"></div>
 
-        <div className="tooltips ">{/* corregido */}
-          <div className="tooltip">
-            <div className="divider"></div>
-            <div className="title"><h2>Built to last</h2></div>
-            <div className="description">
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis nemo doloribus
-                voluptatem in quibusdam quo, corrupti illo, alias error ut excepturi dolorum hic
-                recusandae incidunt odit vel
-              </p>
-            </div>
-          </div>
+       <div className="tooltips">
+  <div className="tooltip">
+    <div className="divider"></div>
+    <div className="title"><h2>Negocio</h2></div>
+    <div className="description">
+      <p>
+        ¿Cansado de la publicidad digital? Distribuye tus premios
+        en tu ubicación exacta. <span>Garantizamos que los usuarios cercanos usen la app, se dirijan a tu local para reclamar su Capy Coin y te conozcan.</span>
+      </p>
+    </div>
+  </div>
 
-          <div className="tooltip">
-
-            <div className="divider"></div>
-            <div className="title"><h2>Stay synced</h2></div>
-            <div className="description">
-              <p>
-               el mundo de las criptomodenas
-               Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis nemo doloribus
-                voluptatem in quibusdam quo, corrupti illo, alias error ut excepturi dolorum hic
-                recusandae incidunt odit vel
-
-              </p>
-            </div>
-          </div>
-        </div>
+  <div className="tooltip">
+    <div className="divider"></div>
+    <div className="title"><h2>Explorador</h2></div>
+    <div className="description">
+      <p>
+        ¿Quieres ganar premios explorando? Abre el mapa y <span>encuentra Capy Coins y ofertas</span> que negocios de tu vecindario han colocado para ti. Acércate al punto para reclamar tu premio. <span>¡La recompensa está a pocos metros!</span>
+      </p>
+    </div>
+  </div>
+</div>
 
         <div className="model-container" ref={modelContainerRef} />
       </section>
