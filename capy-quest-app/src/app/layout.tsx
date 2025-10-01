@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CapyQuest",
-  description: "Un juego web3 de aventuras en Avalanche",
+  description: "Un juego web3 de aventuras en Polkadot",
 };
 
 export default function RootLayout({
