@@ -7,6 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import * as THREE from 'three'
 import './landing.css'
+import IntroSection from './IntroSection'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -183,7 +184,7 @@ export default function Landing() {
     ScrollTrigger.create({
   trigger: root.querySelector('.product-overview')!,
   start: 'top top',
-  end: `+=${window.innerHeight * 10}px`,
+  end: `+=${window.innerHeight * 0.8}px`,
   pin: true,
   pinSpacing: true,
   scrub: 1,
@@ -268,9 +269,7 @@ export default function Landing() {
 
   return (
     <div ref={rootRef}>
-      <section className="intro">
-        <h1>Capi coins</h1>
-      </section>
+       <IntroSection />
 
       <section className="product-overview">
         <div className="header-1 text-black"><h1>Impulsa tu negocio</h1></div>
@@ -303,9 +302,7 @@ export default function Landing() {
         <div className="model-container" ref={modelContainerRef} />
       </section>
 
-      <section className="outro">
-        <h1>Registrate ahora</h1>
-      </section>
+
     </div>
   )
 }

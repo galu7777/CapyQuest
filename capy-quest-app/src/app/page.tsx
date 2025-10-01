@@ -2,12 +2,13 @@
 
 import Landing from "@/pages/Landing/Landing";
 import Carrusel from './../pages/Landing/Carrusel';
-import BuyCapyCoins from "@/pages/BuyCapyCoins";
+import Header from "@/pages/Landing/Header";
 
 
 export default function Home() {
   return (
     <main>
+      <Header />
       {/* <BuyCapyCoins /> */}
        <Landing />
       <Carrusel />
